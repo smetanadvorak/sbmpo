@@ -86,85 +86,21 @@ float model::EnergyModel::heuristic(const State& current,
 
 State model::EnergyModel::next_state(const State& state,
 	const Control& control,
-	float integ_step_size) {
+	float dt) {
 
-	float v_x, v_y, phi, w, v, radius, robot_vx, robot_vy, robot_w;
+	State next = state;
 
-	State next(state.size(), 0);
+	double v = control[0];
+	double w = control[1];
 
-	w = control[0];
-	v = control[1];
+	double d_theta = w * dt;
+	double theta_inter = state[2] + 0.5*d_theta;
+	double dl = v * dt;
 
-	if (model_type == 1) {
-		robot_vx = v;
-		robot_vy = 0;
-		robot_w = w/expF;
-	} else {
-		/*                                                    *
-		 *           New Slip Model as from Kelly work        *
-		 *                                                    */
-		/* Robot Kinematic Model */
-		/*
-		 *   |  V_x  |     | x1  x2  x3 |   |   lin_v     |   *
-		 *   |  V_y  |  =  | y1  y2  y3 | . |   ang_v     |   *
-		 *   | omega |     | z1  z2  z3 |   | lin_v.ang_v |   *
-		 */
-		robot_vx = (slip_x[0]*v) + (slip_x[1]*w) + (slip_x[2]*v*w);
-		robot_vy = (slip_y[0]*v) + (slip_y[1]*w) + (slip_y[2]*v*w);
-		robot_w  = (slip_z[0]*v) + (slip_z[1]*w) + (slip_z[2]*v*w);
-	}
-
-	phi = state[2];
-	next[2] = phi + robot_w*integ_step_size;
-
-	// patch to fix round-off errors
-	float sin_theta = sin(next[2]), cos_theta = cos(next[2]);
-
-	if (abs(sin_theta) < 0.001) sin_theta = 0.0;
-	if (abs(cos_theta) < 0.001) cos_theta = 0.0;
-
-	v_x = (robot_vx * cos_theta) - (robot_vy * sin_theta);
-	v_y = (robot_vx * sin_theta) + (robot_vy * cos_theta);
-
-	next[0] = state[ 0 ] + (v_x) * integ_step_size;
-	next[1] = state[ 1 ] + (v_y) * integ_step_size;
-	// Wheel angular velocities of the robot
-	next[3] = (robot_vx+((B*w)/2))/rad;
-	next[4] = (robot_vx-((B*w)/2))/rad;
-
-	// Correcting for small values
-	/* Not able to understand the reason so far*/
-
-	if (next[0]>-0.0001 && next[0]<0.0001)
-		next[0] = 0;
-
-	if (next[1]>-0.0001 && next[1]<0.0001)
-		next[1] = 0;
-
-	// Making sure that next[3] always got the outer wheel velocity
-	if (robot_w < 0) {
-		next[3] = (robot_vx-((B*w)/2))/rad;
-		next[4] = (robot_vx+((B*w)/2))/rad;
-	}
-
-	// Computing turn radius
-	if (w!=0) {
-		next[5] = (robot_vx)/w;
-	} else {
-		next[5] = 1000;
-	}
-
-	DEBUG("MODEL => Model::next_state, "
-		<< "state => " << state << ", "
-		<< "next => " << next << ", "
-		<< "control => " << control << ", "
-		<< "robot omega => " << robot_w << ", "
-		<< "v_x => " << v_x << ", "
-		<< "v_y => " << v_y << ", "
-		<< "sample time => " << integ_step_size
-	);
-
-	return next;
+	next[0] += dl*cos(theta_inter);
+	next[1] += dl*sin(theta_inter);
+	next[2] += d_theta;
+	return next;	
 }
 
 bool model::EnergyModel::is_valid(const State& current, const Control& control) {
