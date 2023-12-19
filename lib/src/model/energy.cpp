@@ -48,10 +48,10 @@ float model::EnergyModel::cost(const State& current,
 
 	float cost;
 
-	if(energy_flag)
-		cost = this->pow_distance_2d(next[0], next[1], current[0], current[1], current[3], current[4],current[5], control[1]);
-	else
-		cost = this->distance(current, next, model_dof);
+	// if(energy_flag)
+	// 	cost = this->pow_distance_2d(next[0], next[1], current[0], current[1], current[3], current[4],current[5], control[1]);
+	// else
+	cost = this->distance(current, next, model_dof);
 
 
 	DEBUG("MODEL => Model::cost, "
@@ -69,10 +69,10 @@ float model::EnergyModel::heuristic(const State& current,
 
 	float h;
 
-	if (energy_flag)
-		h = this->hpow_distance_2d(current[0], goal[0], current[1], goal[1], current[2], (control[1] / WHEEL_RADIUS), control[1]);
-	else
-		h = this->distance(current, goal, model_dof);
+	// if (energy_flag)
+	// 	h = this->hpow_distance_2d(current[0], goal[0], current[1], goal[1], current[2], (control[1] / WHEEL_RADIUS), control[1]);
+	// else
+	h = this->distance(current, goal, model_dof);
 
 	DEBUG("MODEL => Model::heuristic, "
 		<< "current state => " << current << ", "
@@ -176,60 +176,58 @@ void model::from_json(const json& j, model::EnergyModel& model) {
 
 void model::EnergyModel::readFile(string surface, int slope, int pload)
 {
-	float temp;
-	char filename[256];
-	char terrain[256];
-	FILE *myfile;
+	// float temp;
+	// char filename[256];
+	// char terrain[256];
+	// FILE *myfile;
 
-	int i = 0;
-	int j = 0;
-	int radius=1000.0;
+	// int i = 0;
+	// int j = 0;
+	// int radius=1000.0;
 
-	slo = slope;
-	sprintf(terrain,"%s",surface.c_str());
+	// slo = slope;
+	// sprintf(terrain,"%s",surface.c_str());
 
-	sprintf(filename,"resources//kinematic//%s_turn_rad.txt",terrain);
-	myfile = fopen(filename, "r");
-	while ( fscanf(myfile, "%f", &temp) != EOF)
-	{
-		turn_rad[ i++ ] = (temp);
-	}
-	fclose(myfile);
-	Ntr = i;
-	Nh = 1;
+	// myfile = fopen(filename, "r");
+	// while ( fscanf(myfile, "%f", &temp) != EOF)
+	// {
+	// 	turn_rad[ i++ ] = (temp);
+	// }
+	// fclose(myfile);
+	// Ntr = i;
+	// Nh = 1;
 
-	sprintf(filename,"resources//kinematic//%s_torque_in_%d_deg_%dkg_payload.txt",terrain,slope,pload);
-	myfile= fopen(filename, "r");
-	for(i=0;i<Ntr;i++)
-	{
-		for(j=0;j<Nh;j++)
-		{
-			fscanf(myfile,"%f", &temp);
-			torque_in[i][j] = temp;
-		}
-	}
-	fclose(myfile);
+	// sprintf(filename,"resources//kinematic//%s_torque_in_%d_deg_%dkg_payload.txt",terrain,slope,pload);
+	// myfile= fopen(filename, "r");
+	// for(i=0;i<Ntr;i++)
+	// {
+	// 	for(j=0;j<Nh;j++)
+	// 	{
+	// 		fscanf(myfile,"%f", &temp);
+	// 		torque_in[i][j] = temp;
+	// 	}
+	// }
+	// fclose(myfile);
 
-	sprintf(filename,"resources//kinematic//%s_torque_out_%d_deg_%dkg_payload.txt",terrain,slope,pload);
-	myfile = fopen(filename, "r");
-	for(i=0;i<Ntr;i++)
-	{
-		for(j=0;j<Nh;j++)
-		{
-			fscanf(myfile,"%f", &temp);
-			torque_out[i][j] = temp;
-		}
-	}
-	fclose(myfile);
+	// sprintf(filename,"resources//kinematic//%s_torque_out_%d_deg_%dkg_payload.txt",terrain,slope,pload);
+	// myfile = fopen(filename, "r");
+	// for(i=0;i<Ntr;i++)
+	// {
+	// 	for(j=0;j<Nh;j++)
+	// 	{
+	// 		fscanf(myfile,"%f", &temp);
+	// 		torque_out[i][j] = temp;
+	// 	}
+	// }
+	// fclose(myfile);
 
-	heading[0] = 0.0;
-	for(int i = 1;i < Ntr;i++) {
-		if(radius == turn_rad[i] ) {
-			tout_min = torque_out[i][0];
-			tin_min = torque_in[i][0];
-		}
-	}
-
+	// heading[0] = 0.0;
+	// for(int i = 1;i < Ntr;i++) {
+	// 	if(radius == turn_rad[i] ) {
+	// 		tout_min = torque_out[i][0];
+	// 		tin_min = torque_in[i][0];
+	// 	}
+	// }
 }
 
 float model::EnergyModel::compute_time(float x1, float y1, float x2, float y2, float vel)
