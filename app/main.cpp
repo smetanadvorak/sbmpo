@@ -101,38 +101,73 @@ int main(int argc, char* argv[]) {
     config::json output;
 
     // Initialize planner from config
-    try {
-        sbmpo::Planner planner = config::Tuner()
-            .verbose(args["--verbose"].asBool()) // output debug information
-            .load_config(config)
-            .init(model);
+    sbmpo::Planner planner = config::Tuner()
+        .verbose(args["--verbose"].asBool()) // output debug information
+        .load_config(config)
+        .init(model);
 
-        // Compute trajectory
-        Trajectory results = planner.compute_trajectory();
+    // MCQ
+    Obstacle man_obst = {2.0, 2.0, 0.5};
+    vector<float> man_vel = {1.0, 0.0};
+    
+    int n_iter = 1;  // nof iterations
+    float search_delta_t = 0.5;
+    int n_search_steps = 1;
+    float dT = n_search_steps * search_delta_t;  // iteration time, should be a multiple of search's dt
 
-        // Capture output
-        output = results;
+    State start = {0.0, 0.0, 0.0};
+    State goal = {10.0, 10.0, 0.0};
+    State current_state = start;
+    for (int iter = 0; iter < n_iter; iter++)
+    {
+        cout << "iter " << iter << endl;
+
+        // update obstacles
+        for (int i = 0; i < 2; i++) man_obst[i] += dT * man_vel[i];
+        vector<Obstacle> obst_vec = {man_obst};
+
+        // pass map to the model
+        // model->set_obstacles(obst_vec);
+        // cout << "set_obstacles" << endl;
+
+        // init planner with current pose
+        planner.setModel(model);
+        Trajectory results = planner.compute_trajectory(current_state, goal);
+
+        // move along the path, get a new pose
+        current_state = results.trajectory[n_search_steps].state;
+
+        ofstream output_file(to_string(iter) + "_" + args["--output"].asString());
+
+        if (!args["--quiet"].asBool()) {
+            std::cout << output << std::endl;
+        }
+
+        output_file << output << std::endl;
+        output_file.close();
     }
-    catch (config::ConfigError& ce) {
-        std::cerr << "Configuration error: "
-            << ce.what()
-            << std::endl;
-        return EXIT_FAILURE;
-    }
-    catch (sbmpo::PlanningError& pe) {
-        std::cerr << "Planning error: "
-            << pe.what()
-            << std::endl;
-        return EXIT_FAILURE;
-    }
 
-    ofstream output_file(args["--output"].asString());
+    // try {
+    //     // Compute trajectory
+    //     Trajectory results = planner.compute_trajectory();
 
-    if (!args["--quiet"].asBool()) {
-        std::cout << output << std::endl;
-    }
+    //     // Capture output
+    //     output = results;
+    // }
+    // catch (sbmpo::PlanningError& pe) {
+    //     std::cerr << "Planning error: "
+    //         << pe.what()
+    //         << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
-    output_file << output << std::endl;
+    // ofstream output_file(args["--output"].asString());
+
+    // if (!args["--quiet"].asBool()) {
+    //     std::cout << output << std::endl;
+    // }
+
+    // output_file << output << std::endl;
 }
 
 

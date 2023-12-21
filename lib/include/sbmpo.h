@@ -79,6 +79,8 @@ public:
 	// made it public to use it to look ahead from the behaviour class of RFrame
 	// framework
 
+	void setModel(model::Model* model) {model = model;}
+
 private:
 	/// @brief private constructor called inside Tuner
 	Planner(

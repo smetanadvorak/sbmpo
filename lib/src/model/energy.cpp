@@ -438,3 +438,8 @@ void model::EnergyModel::import_obstacles(const string& filename) {
 	obstacle_info.close();
 	/*----done reading obs file -------------------*/
 }
+
+void model::EnergyModel::set_obstacles(const vector<Obstacle> obs_list)
+{
+	this->obs_list = obs_list;
+}
