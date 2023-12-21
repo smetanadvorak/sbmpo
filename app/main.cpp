@@ -111,12 +111,12 @@ int main(int argc, char* argv[]) {
     Obstacle man_obst = {2.0, 2.0, 0.5};
     vector<float> man_vel = {1.0, 0.0};
     
-    int n_iter = 3;  // nof iterations
+    int n_iter = 20;  // nof iterations
     float search_delta_t = 0.5;
     int n_search_steps = 1;
     float dT = n_search_steps * search_delta_t;  // iteration time, should be a multiple of search's dt
 
-    State start = {0.0, 0.0, 0.0};
+    State start = {1.0, 0.0, 0.0};
     State goal = {10.0, 10.0, 0.0};
     State current_state = start;
     cout << "Model control dof: " << model->control_dof() << endl;
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
         write_obst(filename, obst_vec);
 
         // pass map to the model
-        model->set_obstacles(obst_vec);
+        model->set_obstacles(obst_vec, current_state);
 
         // init planner with current pose
         planner.setModel(model);

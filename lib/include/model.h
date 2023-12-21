@@ -205,7 +205,7 @@ public:
 	/// Uses nlohmann's [json library](https://github.com/nlohmann/json).
 	friend void from_json(const json& j, Model& model);
 
-	virtual void set_obstacles(const vector<Obstacle> obstacles) {};
+	virtual void set_obstacles(const vector<Obstacle> obstacles, State state) {};
 
 };
 

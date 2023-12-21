@@ -75,7 +75,7 @@ public:
 	/// @brief perform collision checks on each node
 	virtual bool is_valid(const State& current, const Control& control) final;
 
-	virtual void set_obstacles(const vector<Obstacle> obstacles) final;
+	virtual void set_obstacles(const vector<Obstacle> obstacles, State state) final;
 
 	/// @brief serialize `EnergyModel` values into json
 	///

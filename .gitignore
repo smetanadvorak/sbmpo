@@ -33,9 +33,14 @@
 
 *.vscode
 *.png
+*.gif
 
 results/*
 !results/.gitkeep
 
 bin/*
 !bin/.gitkeep
+
+scripts/results/*
+scripts/configs/*
+*__pycache__*

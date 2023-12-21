@@ -439,8 +439,8 @@ void model::EnergyModel::import_obstacles(const string& filename) {
 	/*----done reading obs file -------------------*/
 }
 
-void model::EnergyModel::set_obstacles(const vector<Obstacle> obs_list)
+void model::EnergyModel::set_obstacles(const vector<Obstacle> in_obs_list, State state)
 {
-	cout << "called" << endl;
-	this->obs_list = obs_list;
+	obs_list = obs_list;
+	fill_obs_grid(state);
 }
