@@ -441,5 +441,6 @@ void model::EnergyModel::import_obstacles(const string& filename) {
 
 void model::EnergyModel::set_obstacles(const vector<Obstacle> obs_list)
 {
+	cout << "called" << endl;
 	this->obs_list = obs_list;
 }
